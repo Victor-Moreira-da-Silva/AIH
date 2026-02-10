@@ -226,6 +226,14 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # ---------------- USUÁRIOS ----------------
 
+LOGO_CANDIDATOS = [
+    "logo_santa_casa.png",
+    "logo_santa_casa.jpg",
+    "logo_santa_casa.jpeg",
+    "logo_santa_casa.webp",
+    "logo_santa_casa.svg",
+]
+
 # Garante schema pronto mesmo quando a aplicação é iniciada via WSGI/flask run
 criar_tabela()
 garantir_colunas_status()
@@ -245,6 +253,16 @@ def login_required(func):
             return redirect(url_for("login"))
         return func(*args, **kwargs)
     return wrapper
+
+@app.context_processor
+def injetar_logo_santa_casa():
+    static_dir = os.path.join(os.path.dirname(__file__), "static")
+
+    for arquivo_logo in LOGO_CANDIDATOS:
+        if os.path.exists(os.path.join(static_dir, arquivo_logo)):
+            return {"logo_santa_casa": arquivo_logo}
+
+    return {"logo_santa_casa": None}
 
 
 # ---------------- IMPRIMIR PDF ----------------

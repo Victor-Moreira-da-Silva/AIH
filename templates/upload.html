@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+.logo-home-santa-casa{max-height:90px;width:auto;}
+</style>
 
 <div class="row">
 
@@ -11,6 +14,9 @@
 <div class="card shadow border-0">
 
 <div class="card-body text-center">
+{% if logo_santa_casa %}
+<img src="{{ url_for('static', filename=logo_santa_casa) }}" alt="Logo Santa Casa" class="logo-home-santa-casa mb-3">
+{% endif %}
 
 <h5 class="mb-3">Sistema de AIH</h5>
 
