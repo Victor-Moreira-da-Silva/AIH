@@ -251,6 +251,9 @@ def login_required(func):
     def wrapper(*args, **kwargs):
         if "usuario" not in session:
             return redirect(url_for("login"))
+        if session.get("perfil") != "ADM":
+            flash("Acesso restrito ao administrador.")
+            return redirect(url_for("upload_aih"))
         return func(*args, **kwargs)
     return wrapper
 
@@ -535,6 +538,59 @@ def login():
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+# ---------------- ADMIN USUÁRIOS ----------------
+
+@app.route("/admin/usuarios", methods=["GET", "POST"])
+@admin_required
+def admin_usuarios():
+
+    if request.method == "POST":
+        novo_login = (request.form.get("login") or "").strip()
+        nova_senha = request.form.get("senha") or ""
+        perfil = (request.form.get("perfil") or "").strip().upper()
+
+        perfis_validos = {"ADM", "MEDICO", "SECRETARIA"}
+
+        if not novo_login or not nova_senha:
+            flash("Informe login e senha para cadastrar o usuário.")
+            return redirect(url_for("admin_usuarios"))
+
+        if perfil not in perfis_validos:
+            flash("Perfil inválido. Escolha ADM, MEDICO ou SECRETARIA.")
+            return redirect(url_for("admin_usuarios"))
+
+        conn = conectar_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM usuarios WHERE login = ?", (novo_login,))
+        existente = cursor.fetchone()
+
+        if existente:
+            conn.close()
+            flash("Já existe um usuário com esse login.")
+            return redirect(url_for("admin_usuarios"))
+
+        cursor.execute(
+            """
+            INSERT INTO usuarios (login, senha_hash, perfil)
+            VALUES (?, ?, ?)
+            """,
+            (novo_login, gerar_hash_senha(nova_senha), perfil),
+        )
+
+        conn.commit()
+        conn.close()
+
+        flash("Usuário cadastrado com sucesso.")
+        return redirect(url_for("admin_usuarios"))
+
+    conn = conectar_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, login, perfil FROM usuarios ORDER BY login ASC")
+    usuarios = cursor.fetchall()
+    conn.close()
+
+    return render_template("admin_usuarios.html", usuarios=usuarios)
 
 
 # ---------------- NOVA AIH ----------------

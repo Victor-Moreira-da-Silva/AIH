@@ -24,6 +24,10 @@
 </span>
 
 <div>
+{% if session.perfil == "ADM" %}
+<a href="/admin/usuarios" class="btn btn-warning btn-sm me-2">ADM Usuários</a>
+{% endif %}
+
 <span class="text-white me-3">
 Usuário: {{ session.usuario }}
 </span>
