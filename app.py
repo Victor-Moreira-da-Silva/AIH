@@ -2,12 +2,12 @@ from flask import Flask, render_template, request, redirect, flash, send_from_di
 import os
 from datetime import datetime
 import pdfplumber
-import re
 import csv
 import sqlite3
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from PyPDF2 import PdfReader, PdfWriter
+from functools import wraps
 
 # ---------------- BANCO ----------------
 
@@ -91,7 +91,11 @@ def criar_tabela():
         -- ARQUIVO
         arquivo_pdf TEXT,
         necessita_apa TEXT,
-        status TEXT DEFAULT 'Pendente'
+        status TEXT DEFAULT 'Pendente',
+        usuario_aprovacao TEXT,
+        data_aprovacao TEXT,
+        usuario_reprovacao TEXT,
+        data_reprovacao TEXT
 
     )
     """)
@@ -99,12 +103,29 @@ def criar_tabela():
     conn.commit()
     conn.close()
 
+def garantir_colunas_status():
+    colunas_necessarias = {
+        "usuario_aprovacao": "TEXT",
+        "data_aprovacao": "TEXT",
+        "usuario_reprovacao": "TEXT",
+        "data_reprovacao": "TEXT",
+    }
 
+    conn = conectar_db()
+    cursor = conn.cursor()
+    cursor.execute("PRAGMA table_info(aih)")
+    colunas_existentes = {coluna[1] for coluna in cursor.fetchall()}
+
+    for coluna, tipo in colunas_necessarias.items():
+        if coluna not in colunas_existentes:
+            cursor.execute(f"ALTER TABLE aih ADD COLUMN {coluna} {tipo}")
+
+    conn.commit()
+    conn.close()
 # ---------------- CONFIG ----------------
 
 app = Flask(__name__)
-app.secret_key = "aih_secret"
-
+app.secret_key = os.getenv("SECRET_KEY", "aih_secret")
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {"pdf"}
 
@@ -124,11 +145,11 @@ def allowed_file(filename):
 
 
 def login_required(func):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         if "usuario" not in session:
             return redirect(url_for("login"))
         return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__
     return wrapper
 
 
@@ -166,7 +187,7 @@ def formatar_data(data_iso):
 
     try:
         return datetime.strptime(data_iso, "%Y-%m-%d").strftime("%d/%m/%Y")
-    except:
+    except ValueError:
         return data_iso
     
 #----------ARRUMA O CAMPO SEXO--------   
@@ -346,8 +367,8 @@ def extrair_texto_pdf(caminho):
         with pdfplumber.open(caminho) as pdf:
             for pagina in pdf.pages:
                 texto += pagina.extract_text() or ""
-    except:
-        pass
+    except Exception as exc:
+        app.logger.warning("Falha ao extrair texto do PDF %s: %s", caminho, exc)
     return texto
 
 
@@ -634,8 +655,8 @@ def listar_aih():
                 else:
                     dias_sistema = "✔ Finalizada"
 
-            except:
-                pass
+            except ValueError:
+                data_hora = "-"
 
         lista.append({
             "arquivo": item["arquivo_pdf"],
@@ -687,7 +708,7 @@ def ver_aih(id):
 
 # ---------------- ACEITAR ----------------
 
-@app.route("/aceitar/<int:id>")
+@app.route("/aceitar/<int:id>", methods=["POST"])
 @login_required
 def aceitar_aih(id):
 
@@ -717,7 +738,7 @@ def aceitar_aih(id):
 
 # ---------------- REPROVAR ----------------
 
-@app.route("/reprovar/<int:id>")
+@app.route("/reprovar/<int:id>", methods=["POST"])
 @login_required
 def reprovar_aih(id):
 
@@ -782,4 +803,7 @@ def imprimir_aih(id):
 
 if __name__ == "__main__":
     criar_tabela()
+    garantir_colunas_status()
     app.run(host="0.0.0.0", port=5000)
+
+

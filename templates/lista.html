@@ -94,13 +94,13 @@ href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 {% if session.perfil == "SECRETARIA" and item.status == "Pendente" %}
 
-<a href="/aceitar/{{ item.id }}" class="btn btn-sm btn-success">
-✔ Aceitar
-</a>
+<form method="post" action="/aceitar/{{ item.id }}" class="d-inline">
+<button type="submit" class="btn btn-sm btn-success">✔ Aceitar</button>
+</form>
 
-<a href="/reprovar/{{ item.id }}" class="btn btn-sm btn-danger">
-✖ Reprovar
-</a>
+<form method="post" action="/reprovar/{{ item.id }}" class="d-inline">
+<button type="submit" class="btn btn-sm btn-danger">✖ Reprovar</button>
+</form>
 
 {% endif %}
 

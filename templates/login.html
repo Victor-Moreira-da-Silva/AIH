@@ -24,6 +24,14 @@ Sistema AIH
 
 <div class="card-body">
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="alert alert-danger" role="alert">
+      {{ messages[0] }}
+    </div>
+  {% endif %}
+{% endwith %}
+
 <form method="POST">
 
 <div class="mb-3">
