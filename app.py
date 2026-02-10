@@ -224,7 +224,7 @@ ALLOWED_EXTENSIONS = {"pdf"}
 
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
-# ---------------- USUÁRIOS ----------------
+# ---------------- logo da santa casa ----------------
 
 LOGO_CANDIDATOS = [
     "logo_santa_casa.png",
@@ -251,11 +251,23 @@ def login_required(func):
     def wrapper(*args, **kwargs):
         if "usuario" not in session:
             return redirect(url_for("login"))
+        return func(*args, **kwargs)
+    return wrapper
+
+
+def admin_required(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if "usuario" not in session:
+            return redirect(url_for("login"))
+
         if session.get("perfil") != "ADM":
             flash("Acesso restrito ao administrador.")
             return redirect(url_for("upload_aih"))
+
         return func(*args, **kwargs)
     return wrapper
+
 
 @app.context_processor
 def injetar_logo_santa_casa():
@@ -542,8 +554,14 @@ def logout():
 # ---------------- ADMIN USUÁRIOS ----------------
 
 @app.route("/admin/usuarios", methods=["GET", "POST"])
-@admin_required
 def admin_usuarios():
+
+    if "usuario" not in session:
+        return redirect(url_for("login"))
+
+    if session.get("perfil") != "ADM":
+        flash("Acesso restrito ao administrador.")
+        return redirect(url_for("upload_aih"))
 
     if request.method == "POST":
         novo_login = (request.form.get("login") or "").strip()
@@ -591,7 +609,6 @@ def admin_usuarios():
     conn.close()
 
     return render_template("admin_usuarios.html", usuarios=usuarios)
-
 
 # ---------------- NOVA AIH ----------------
 @app.route("/nova_aih", methods=["GET","POST"])

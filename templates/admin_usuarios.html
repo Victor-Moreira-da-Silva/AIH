@@ -9,6 +9,7 @@
   </div>
   <div class="card-body">
     <form method="POST" class="row g-3">
+      <input type="hidden" name="acao" value="cadastrar">
       <div class="col-md-4">
         <label class="form-label">Login</label>
         <input type="text" name="login" class="form-control" required>
@@ -43,6 +44,7 @@
           <th>ID</th>
           <th>Login</th>
           <th>Perfil</th>
+          <th>Alterar senha</th>
         </tr>
       </thead>
       <tbody>
@@ -51,10 +53,18 @@
           <td>{{ usuario.id }}</td>
           <td>{{ usuario.login }}</td>
           <td>{{ usuario.perfil }}</td>
+          <td>
+            <form method="POST" class="d-flex gap-2">
+              <input type="hidden" name="acao" value="alterar_senha">
+              <input type="hidden" name="usuario_id" value="{{ usuario.id }}">
+              <input type="password" name="nova_senha" class="form-control form-control-sm" placeholder="Nova senha" required>
+              <button type="submit" class="btn btn-sm btn-outline-primary">Alterar</button>
+            </form>
+          </td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="3" class="text-center text-muted">Nenhum usuário cadastrado.</td>
+          <td colspan="4" class="text-center text-muted">Nenhum usuário cadastrado.</td>
         </tr>
         {% endfor %}
       </tbody>
