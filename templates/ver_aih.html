@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<div class="card-header bg-success text-white">
+Detalhes da AIH
+</div>
+
+<div class="card-body">
+
+<h4 class="text-primary">Paciente</h4>
+
+<p><b>Nome:</b> {{ dados.nome_paciente }}</p>
+<p><b>Prontuário:</b> {{ dados.prontuario }}</p>
+<p><b>CNS:</b> {{ dados.cns }}</p>
+<p><b>Nascimento:</b> {{ dados.data_nascimento }}</p>
+<p><b>Sexo:</b> {{ dados.sexo }}</p>
+<p><b>Raça/Cor:</b> {{ dados.raca_cor }}</p>
+<p><b>Etnia:</b> {{ dados.etnia }}</p>
+<p><b>Nome da Mãe:</b> {{ dados.nome_mae }}</p>
+
+<hr>
+
+<h4 class="text-primary">Contato</h4>
+
+<p><b>Telefone 1:</b> {{ dados.telefone1 }}</p>
+<p><b>Telefone 2:</b> {{ dados.telefone2 }}</p>
+<p><b>Responsável:</b> {{ dados.responsavel }}</p>
+
+<hr>
+
+<h4 class="text-primary">Endereço</h4>
+
+<p><b>Endereço:</b> {{ dados.endereco }}</p>
+<p><b>Município:</b> {{ dados.municipio }}</p>
+<p><b>IBGE:</b> {{ dados.ibge }}</p>
+<p><b>UF:</b> {{ dados.uf }}</p>
+<p><b>CEP:</b> {{ dados.cep }}</p>
+
+<hr>
+
+<h4 class="text-primary">Justificativa</h4>
+
+<p><b>Sinais:</b> {{ dados.sinais }}</p>
+<p><b>Condições:</b> {{ dados.condicoes }}</p>
+<p><b>Provas:</b> {{ dados.provas }}</p>
+<p><b>Diagnóstico:</b> {{ dados.diagnostico }}</p>
+<p><b>CID Principal:</b> {{ dados.cid_principal }}</p>
+<p><b>CID Secundário:</b> {{ dados.cid_secundario }}</p>
+<p><b>CID Associado:</b> {{ dados.cid_associado }}</p>
+
+<hr>
+
+<h4 class="text-primary">Procedimento</h4>
+
+<p><b>Descrição:</b> {{ dados.descricao_procedimento }}</p>
+<p><b>Código:</b> {{ dados.codigo_procedimento }}</p>
+<p><b>Clínica:</b> {{ dados.clinica }}</p>
+<p><b>Caráter:</b> {{ dados.carater }}</p>
+
+<p><b>Profissional:</b> {{ dados.nome_prof }}</p>
+<p><b>Documento:</b> {{ dados.doc_prof }}</p>
+<p><b>Número:</b> {{ dados.numero_doc_prof }}</p>
+<p><b>Data Solicitação:</b> {{ dados.data_solicitacao }}</p>
+
+<hr>
+
+<h4 class="text-primary">Causa Externa</h4>
+
+<p><b>Tipo:</b> {{ dados.tipo_acidente }}</p>
+<p><b>CNPJ Seguradora:</b> {{ dados.cnpj_seguradora }}</p>
+<p><b>CNPJ Empresa:</b> {{ dados.cnpj_empresa }}</p>
+<p><b>Nº Bilhete:</b> {{ dados.numero_bilhete }}</p>
+<p><b>CNAE:</b> {{ dados.cnae }}</p>
+<p><b>Série:</b> {{ dados.serie }}</p>
+<p><b>CBOR:</b> {{ dados.cbor }}</p>
+<p><b>Vínculo:</b> {{ dados.vinculo_empresa }}</p>
+
+<hr>
+
+<h4 class="text-primary">Autorização</h4>
+
+<p><b>Nome Autorizador:</b> {{ dados.nome_autorizador }}</p>
+<p><b>Órgão Emissor:</b> {{ dados.orgao_emissor }}</p>
+<p><b>Documento:</b> {{ dados.doc_autorizador }}</p>
+<p><b>Número Documento:</b> {{ dados.numero_doc_autorizador }}</p>
+<p><b>Data Autorização:</b> {{ dados.data_autorizacao }}</p>
+<p><b>Número AIH:</b> {{ dados.numero_autorizacao }}</p>
+
+</div>
+</div>
+
+{% endblock %}

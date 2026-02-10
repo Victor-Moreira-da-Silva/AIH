@@ -1,0 +1,354 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+<div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+
+<span>Nova AIH</span>
+
+<a href="/lista" class="btn btn-light btn-sm">
+⬅ Voltar
+</a>
+
+</div>
+
+<div class="card-body">
+
+<form method="POST" enctype="multipart/form-data">
+
+
+<!-- ================= PACIENTE ================= -->
+
+<h5 class="text-primary mb-3">Identificação do Paciente</h5>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+<label>Nome do Paciente</label>
+<input name="nome_paciente" class="form-control" required>
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Prontuário</label>
+<input name="prontuario" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>CNS</label>
+<input name="cns" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Data Nascimento</label>
+<input type="date" name="data_nascimento" class="form-control">
+</div>
+
+<div class="col-md-2 mb-3">
+<label>Sexo</label>
+<select name="sexo" class="form-select">
+<option value="M">Masculino</option>
+<option value="F">Feminino</option>
+</select>
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Raça/Cor</label>
+<input name="raca_cor" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Etnia</label>
+<input name="etnia" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Telefone 1</label>
+<input name="telefone1" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Telefone 2</label>
+<input name="telefone2" class="form-control">
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Nome da Mãe</label>
+<input name="nome_mae" class="form-control">
+</div>
+
+<div class="col-md-6 mb-3">
+<label>Responsável</label>
+<input name="responsavel" class="form-control">
+</div>
+
+<div class="col-md-8 mb-3">
+<label>Endereço</label>
+<input name="endereco" class="form-control">
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Município</label>
+<input name="municipio" class="form-control">
+</div>
+
+<div class="col-md-2 mb-3">
+<label>IBGE Município</label>
+<input name="ibge" class="form-control">
+</div>
+
+<div class="col-md-2 mb-3">
+<label>UF</label>
+<input name="uf" class="form-control">
+</div>
+
+<div class="col-md-4 mb-3">
+<label>CEP</label>
+<input name="cep" class="form-control">
+</div>
+
+</div>
+
+<hr>
+
+<!-- ================= JUSTIFICATIVA ================= -->
+
+<h5 class="text-primary mb-3">Justificativa da Internação</h5>
+
+<div class="mb-3">
+<label>Sinais e Sintomas</label>
+<textarea name="sinais" class="form-control"></textarea>
+</div>
+
+<div class="mb-3">
+<label>Condições que Justificam Internação</label>
+<textarea name="condicoes" class="form-control"></textarea>
+</div>
+
+<div class="mb-3">
+<label>Provas Diagnósticas</label>
+<textarea name="provas" class="form-control"></textarea>
+</div>
+
+<div class="mb-3">
+<label>Diagnóstico Inicial</label>
+<input name="diagnostico" class="form-control">
+</div>
+
+<div class="row">
+
+<div class="col-md-4 mb-3">
+<label>CID Principal</label>
+<input name="cid_principal" class="form-control">
+</div>
+
+<div class="col-md-4 mb-3">
+<label>CID Secundário</label>
+<input name="cid_secundario" class="form-control">
+</div>
+
+<div class="col-md-4 mb-3">
+<label>CID Associado</label>
+<input name="cid_associado" class="form-control">
+</div>
+
+</div>
+
+<hr>
+
+<!-- ================= PROCEDIMENTO ================= -->
+
+<h5 class="text-primary mb-3">Procedimento Solicitado</h5>
+
+<div class="mb-3">
+<label>Descrição Procedimento</label>
+<input name="descricao_procedimento" class="form-control">
+</div>
+
+<div class="row">
+
+<div class="col-md-3 mb-3">
+<label>Código Procedimento</label>
+<input name="codigo_procedimento" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Clínica</label>
+<input name="clinica" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Caráter Internação</label>
+<input name="carater" class="form-control">
+</div>
+
+</div>
+
+<div class="row">
+
+<div class="col-md-3 mb-3">
+<label>Documento Profissional</label>
+<input name="doc_prof" class="form-control">
+</div>
+
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Nº Documento</label>
+<input name="numero_doc_prof" class="form-control">
+</div>
+
+<div class="col-md-4 mb-3">
+<label>Nome Profissional</label>
+<input name="nome_prof" class="form-control">
+</div>
+
+<div class="col-md-2 mb-3">
+<label>Data Solicitação</label>
+
+<input type="date"
+       class="form-control"
+       value="{{ hoje }}"
+       readonly>
+
+<input type="hidden"
+       name="data_solicitacao"
+       value="{{ hoje }}">
+
+</div>
+
+<hr>
+
+<!-- ================= CAUSA EXTERNA ================= -->
+
+<h5 class="text-primary mb-3">Causa Externa</h5>
+
+<div class="row">
+
+<div class="col-md-3 mb-3">
+<label>Tipo Acidente</label>
+<input name="tipo_acidente" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>CNPJ Seguradora</label>
+<input name="cnpj_seguradora" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>CNPJ Empresa</label>
+<input name="cnpj_empresa" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Nº Bilhete</label>
+<input name="numero_bilhete" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>CNAE</label>
+<input name="cnae" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Série</label>
+<input name="serie" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>CBOR</label>
+<input name="cbor" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Vínculo Empresa</label>
+<input name="vinculo_empresa" class="form-control">
+</div>
+
+</div>
+
+<hr>
+
+<!-- ================= AUTORIZAÇÃO ================= -->
+
+<h5 class="text-primary mb-3">Autorização</h5>
+
+<div class="row">
+
+<div class="col-md-4 mb-3">
+<label>Nome Autorizador</label>
+<input name="nome_autorizador" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Órgão Emissor</label>
+<input name="orgao_emissor" class="form-control">
+</div>
+
+<div class="col-md-2 mb-3">
+<label>Documento</label>
+<input name="doc_autorizador" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Nº Documento</label>
+<input name="numero_doc_autorizador" class="form-control">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Data Autorização</label>
+
+<input type="date"
+       class="form-control"
+       value="{{ hoje }}"
+       readonly>
+
+<input type="hidden"
+       name="data_autorizacao"
+       value="{{ hoje }}">
+
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Nº Autorização AIH</label>
+<input name="numero_autorizacao" class="form-control">
+</div>
+
+</div>
+
+<hr>
+
+<hr>
+
+<h5 class="text-primary mb-3">Anexar PDF da AIH</h5>
+
+<div class="row">
+
+<div class="col-md-6 mb-3">
+<label>Selecionar PDF</label>
+<input type="file" name="file" class="form-control" accept=".pdf">
+</div>
+
+<div class="col-md-3 mb-3">
+<label>Necessita APA?</label>
+<select name="apa" class="form-select" required>
+<option value="">Selecione</option>
+<option value="SIM">Sim</option>
+<option value="NAO">Não</option>
+</select>
+</div>
+
+</div>
+
+
+
+<button class="btn btn-success btn-lg mt-3">
+Salvar AIH
+</button>
+
+</form>
+
+</div>
+</div>
+
+{% endblock %}

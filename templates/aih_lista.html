@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card shadow">
+
+<div class="card-header bg-primary text-white">
+AIHs Cadastradas
+</div>
+
+<div class="card-body">
+
+<table class="table table-striped">
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Paciente</th>
+<th>APA</th>
+<th>PDF</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for item in lista %}
+
+<tr>
+
+<td>{{ item.id }}</td>
+<td>{{ item.nome_paciente }}</td>
+
+<td>
+{% if item.necessita_apa == "SIM" %}
+<span class="badge bg-info">APA</span>
+{% else %}
+Sem APA
+{% endif %}
+</td>
+
+<td>
+{% if item.arquivo_pdf %}
+<a href="/uploads/{{ item.arquivo_pdf }}" class="btn btn-sm btn-primary">
+Ver PDF
+</a>
+{% else %}
+-
+{% endif %}
+</td>
+
+<td>
+<a href="/ver_aih/{{ item.id }}" class="btn btn-sm btn-success">
+Detalhes
+</a>
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}AIHs Enviadas{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
+<div class="card shadow-lg border-0">
+
+<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+<h5 class="mb-0">📄 AIHs Enviadas</h5>
+
+<a href="/nova_aih" class="btn btn-light btn-sm">
+➕ Nova AIH
+</a>
+</div>
+
+<div class="card-body">
+
+<table id="tabelaAIH" class="table table-hover table-striped align-middle">
+
+<thead class="table-dark">
+<tr>
+<th>Paciente</th>
+<th>APA</th>
+<th>Envio</th>
+<th>Status</th>
+<th>Dias no Sistema</th>
+<th>Ações</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for item in lista %}
+<tr>
+
+<td>
+<strong>{{ item.paciente }}</strong>
+
+{% if not item.arquivo %}
+<br>
+<span class="badge bg-secondary">Sem PDF</span>
+{% endif %}
+</td>
+
+<td>
+{% if item.apa == "Sim" %}
+<span class="badge bg-info">APA</span>
+{% else %}
+<span class="badge bg-secondary">Sem APA</span>
+{% endif %}
+</td>
+
+<td>{{ item.data_hora }}</td>
+
+<td>
+{% if item.status == "Aceita" %}
+<span class="badge bg-success">✔ Aceita</span>
+
+{% elif item.status == "Reprovada" %}
+<span class="badge bg-danger">✖ Reprovada</span>
+
+{% else %}
+<span class="badge bg-warning text-dark">⏳ Pendente</span>
+{% endif %}
+</td>
+
+<td>
+{% if item.status == "Pendente" and item.dias != "-" %}
+<span class="badge bg-danger">{{ item.dias }}</span>
+{% else %}
+{{ item.dias }}
+{% endif %}
+</td>
+
+<td>
+
+<a href="/ver_aih/{{ item.id }}" class="btn btn-sm btn-outline-info">
+📋 Ver AIH
+</a>
+
+<a href="/imprimir/{{ item.id }}" class="btn btn-sm btn-dark">
+🖨 Imprimir
+</a>
+
+{% if item.arquivo %}
+<a href="/uploads/{{ item.arquivo }}" class="btn btn-sm btn-outline-primary">
+👁 PDF
+</a>
+{% endif %}
+
+{% if session.perfil == "SECRETARIA" and item.status == "Pendente" %}
+
+<a href="/aceitar/{{ item.id }}" class="btn btn-sm btn-success">
+✔ Aceitar
+</a>
+
+<a href="/reprovar/{{ item.id }}" class="btn btn-sm btn-danger">
+✖ Reprovar
+</a>
+
+{% endif %}
+
+</td>
+
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#tabelaAIH').DataTable({
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json"
+        },
+        pageLength: 8
+    });
+});
+</script>
+
+{% endblock %}
