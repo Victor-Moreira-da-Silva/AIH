@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastros AIH{% endblock %}
+
+{% block content %}
+<div class="card shadow">
+  <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">📋 Cadastros de AIH</h5>
+    <a href="/lista" class="btn btn-light btn-sm">⬅ Voltar</a>
+  </div>
+
+  <div class="card-body">
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Paciente</th>
+          <th>Prontuário</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in dados %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.nome_paciente }}</td>
+          <td>{{ item.prontuario or "-" }}</td>
+          <td>
+            <a href="/ver_aih/{{ item.id }}" class="btn btn-sm btn-outline-primary">Ver detalhes</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" class="text-center text-muted">Nenhum cadastro encontrado.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -4,6 +4,11 @@ from datetime import datetime
 import pdfplumber
 import csv
 import sqlite3
+import hashlib
+import hmac
+import secrets
+import base64
+from functools import wraps
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from PyPDF2 import PdfReader, PdfWriter
@@ -103,6 +108,92 @@ def criar_tabela():
     conn.commit()
     conn.close()
 
+def criar_tabela_usuarios():
+
+    conn = conectar_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS usuarios (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        login TEXT UNIQUE NOT NULL,
+        senha_hash TEXT NOT NULL,
+        perfil TEXT NOT NULL
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+
+def gerar_hash_senha(senha, iteracoes=120000):
+    sal = secrets.token_hex(16)
+    senha_hash = hashlib.pbkdf2_hmac(
+        "sha256",
+        senha.encode("utf-8"),
+        sal.encode("utf-8"),
+        iteracoes,
+    )
+    senha_b64 = base64.b64encode(senha_hash).decode("utf-8")
+    return f"pbkdf2_sha256${iteracoes}${sal}${senha_b64}"
+
+
+def verificar_senha(senha, senha_hash):
+    try:
+        algoritmo, iteracoes, sal, hash_salvo = senha_hash.split("$", 3)
+        if algoritmo != "pbkdf2_sha256":
+            return False
+
+        senha_calculada = hashlib.pbkdf2_hmac(
+            "sha256",
+            senha.encode("utf-8"),
+            sal.encode("utf-8"),
+            int(iteracoes),
+        )
+        senha_calculada_b64 = base64.b64encode(senha_calculada).decode("utf-8")
+        return hmac.compare_digest(senha_calculada_b64, hash_salvo)
+    except (ValueError, TypeError):
+        return False
+
+
+def garantir_usuarios_padrao():
+    usuarios_padrao = [
+        {
+            "login": os.getenv("AIH_MEDICO_USER", "medico"),
+            "senha": os.getenv("AIH_MEDICO_PASS", "123456"),
+            "perfil": "MEDICO",
+        },
+        {
+            "login": os.getenv("AIH_SECRETARIA_USER", "secretaria"),
+            "senha": os.getenv("AIH_SECRETARIA_PASS", "123456"),
+            "perfil": "SECRETARIA",
+        },
+    ]
+
+    conn = conectar_db()
+    cursor = conn.cursor()
+
+    for usuario in usuarios_padrao:
+        cursor.execute("SELECT id FROM usuarios WHERE login = ?", (usuario["login"],))
+        existe = cursor.fetchone()
+
+        if not existe:
+            cursor.execute(
+                """
+                INSERT INTO usuarios (login, senha_hash, perfil)
+                VALUES (?, ?, ?)
+                """,
+                (
+                    usuario["login"],
+                    gerar_hash_senha(usuario["senha"]),
+                    usuario["perfil"],
+                ),
+            )
+
+    conn.commit()
+    conn.close()
+
+
 def garantir_colunas_status():
     colunas_necessarias = {
         "usuario_aprovacao": "TEXT",
@@ -122,6 +213,8 @@ def garantir_colunas_status():
 
     conn.commit()
     conn.close()
+
+
 # ---------------- CONFIG ----------------
 
 app = Flask(__name__)
@@ -133,10 +226,11 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # ---------------- USUÁRIOS ----------------
 
-USUARIOS = {
-    "medico": {"senha": "123456", "perfil": "MEDICO"},
-    "secretaria": {"senha": "123456", "perfil": "SECRETARIA"}
-}
+# Garante schema pronto mesmo quando a aplicação é iniciada via WSGI/flask run
+criar_tabela()
+garantir_colunas_status()
+criar_tabela_usuarios()
+garantir_usuarios_padrao()
 
 # ---------------- AUX ----------------
 
@@ -400,9 +494,18 @@ def login():
         login = request.form.get("login")
         senha = request.form.get("senha")
 
-        if login in USUARIOS and senha == USUARIOS[login]["senha"]:
-            session["usuario"] = login
-            session["perfil"] = USUARIOS[login]["perfil"]
+        conn = conectar_db()
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT login, senha_hash, perfil FROM usuarios WHERE login = ?",
+            (login,),
+        )
+        usuario = cursor.fetchone()
+        conn.close()
+
+        if usuario and verificar_senha(senha or "", usuario["senha_hash"]):
+            session["usuario"] = usuario["login"]
+            session["perfil"] = usuario["perfil"]        
             return redirect(url_for("upload_aih"))
 
         flash("Usuário ou senha inválidos")
@@ -802,7 +905,6 @@ def imprimir_aih(id):
 # ---------------- START ----------------
 
 if __name__ == "__main__":
-    criar_tabela()
     garantir_colunas_status()
     app.run(host="0.0.0.0", port=5000)
 
